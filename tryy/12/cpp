@@ -1,0 +1,246 @@
+#include <iostream>
+
+// Створити структуру для представлення дому з атрибутами міста, назви вулиці та номеру будинку. 
+// Створити структуру даних множина, що містить  унікальні об’єкти структури дім та підтримує операції додавання,
+// видалення та перевірки наявності елементу та метод виведення множини у консоль. 
+// Прийняти на вхід дані про задану кількість домів, внести створені об’єкти у множину, але,
+// якщо елементи повторюються, то вносити об’єкти у іншу множину і видаляти з першої.
+// Після цього попросити користувача змінити інформацію про доми, що повторюються, і
+// внести змінені об’єкти домів у першу множину.
+
+using namespace std;
+
+class House{
+private:
+    string city;
+    string street;
+    int number;
+
+public: 
+    House() : city(""), street(""), number(0) {}
+
+    House(string c, string s, int n): city(c), street(s), number(n) {}
+
+    string get_info(){
+        string ss = city + street + to_string(number);
+        return ss;
+    }
+
+    bool operator==(House& other){
+        if(city == other.city && street == other.street && number == other.number){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    void set_city(string c){
+        city = c;
+    }
+
+    void set_street(string s){
+        street = s;
+    }
+
+    void set_number(int n){
+        number = n;
+    }
+
+    void info(){
+        cout << "House is located in " << city << " on " << street << "'s street and its number is " << number << endl;
+    }
+
+
+};
+
+
+class Set{
+private:
+    House houses[100];
+    int size;
+public:
+
+    Set(): size(0) {}
+
+    bool check_element(House a){
+
+       // a.info();
+        for(int i = 0; i < size; i++ ){
+            if(houses[i] == a){
+                return false;
+            }
+        }
+
+        return true;
+        
+    }
+
+    int get_size(){
+        return size;
+    }
+
+    void add_element(House a){
+       // a.info();
+        houses[size] = a;
+        size++;
+        
+    }
+
+    void delete_element(House a){
+        for(int i = 0; i < size; ++i ){
+            if(houses[i] == a){
+                houses[i] = houses[--size];
+                //size--;
+            }
+        }
+    }
+
+    void delete_element_index(int n){
+        houses[n] = houses[--size];
+    }
+
+    Set dublicates(){
+        Set temp;
+        
+
+        for(int i = 0; i < size; i++){
+            for(int j = i+1; j < size; j++){
+                if(i!=j && houses[i] == houses[j]  ){
+                    temp.add_element(houses[i]);
+                    delete_element_index(i);
+                    delete_element_index(j);
+                }
+            }
+
+        }
+
+        return temp;
+    }
+
+    void print_element(int i){
+        houses[i].info();
+    }
+
+    void print(){
+        for(int i = 0; i < size; i++){
+            houses[i].info();
+        }
+    }
+
+    void change_info(int i){
+        string c, s;
+        int num; 
+
+
+        cout << "Enter updated info for city: ";
+        cin >> c;
+        houses[i].set_city(c);
+
+        cout << "Enter updated info for street: ";
+        cin >> s;
+        houses[i].set_street(s);
+
+        cout << "Enter updated info for house number: ";
+        cin >> num;
+        houses[i].set_number(num);
+
+    }
+
+    House get_element(int i){
+        return houses[i];
+    }
+
+};
+
+
+void create_sets(Set& houseSet, Set& duublicates){
+    int size;
+
+    cout << "Enter the size of the set: ";
+    cin >> size;
+
+    for(int i = 0; i < size; i++){
+        string city, street;
+        int number;
+
+        cout << "[ " << i+1 << " ] Enter city: ";
+        cin >> city;
+        cout << "Street: ";
+        cin >> street;
+        cout << "Number: ";
+        cin >> number;
+
+        House a(city, street, number);
+
+        if(houseSet.check_element(a)){
+            houseSet.add_element(a);
+        }else{
+            houseSet.delete_element(a);
+            duublicates.add_element(a);
+        }
+
+    }
+
+}
+
+void create_sets2(Set& houseSet, Set& duublicates){
+    int size;
+
+    cout << "Enter the size of the set: ";
+    cin >> size;
+
+    for(int i = 0; i < size; i++){
+        string city, street;
+        int number;
+
+        cout << "[ " << i+1 << " ] Enter city: ";
+        cin >> city;
+        cout << "Street: ";
+        cin >> street;
+        cout << "Number: ";
+        cin >> number;
+
+        House a(city, street, number);
+
+        houseSet.add_element(a);
+
+    }
+
+    duublicates = houseSet.dublicates();
+
+
+}
+
+void change_info(Set& houseSet, Set& duublicates){
+
+    
+
+    cout << endl << "Now we have to change the info from dublicates" << endl;
+    for(int i = 0; i < duublicates.get_size(); i++ ){
+        duublicates.print_element(i);
+        duublicates.change_info(i);
+        House a = duublicates.get_element(i);
+        houseSet.add_element(a);
+    }
+
+
+
+}
+
+int main(){
+    Set houseSet;
+    Set duublicates;
+
+    create_sets2(houseSet, duublicates);
+
+    cout << "House set:" << endl;
+    houseSet.print();
+    cout << endl << "Dublicates set:" << endl;
+    duublicates.print();
+
+    change_info(houseSet, duublicates);
+    cout << endl << "New house set:" << endl;
+    houseSet.print();
+
+
+}
